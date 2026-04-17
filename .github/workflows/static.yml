@@ -1,0 +1,39 @@
+name: Deploy app to Github pages
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'app/**'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'app/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Notify Slack channel
+        if: env.SLACK_HOOK_URL
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{'text':'Successful deployment of *${GITHUB_REPOSITORY}* \nGitHub Pages URL: ${{ steps.deployment.outputs.page_url }}'}" \
+          ${{ secrets.SLACK_HOOK_URL }}
+        env:
+          SLACK_HOOK_URL: ${{ secrets.SLACK_HOOK_URL}}

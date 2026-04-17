@@ -1,0 +1,12 @@
+body {
+    background-color: #1c454a;
+    margin-top: 5%;
+    color: #54b7c0;
+}
+
+.btn {
+    background-color: #54b7c0;
+    border: 1px solid #1c454a;
+    padding: 20px 30px;
+    position: relative;
+}
